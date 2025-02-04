@@ -1,0 +1,38 @@
+@charset "UTF-8";
+
+
+.move-link{
+    color : red;
+}
+
+.menu-link{
+    background-color : beige;
+}
+
+.card-img-top{
+    width : 262px;
+    height : 174px;
+}
+
+.link-btn{
+    color : white;
+    background-color : #5DC9A7;
+}
+
+.link-btn:hover{
+    color : #5DC9A7;
+
+    background-color : white;
+
+    border : 1px solid #5DC9A7;
+}
+
+.slider-img{
+    width : max-content;
+    height : max-content;
+}
+
+.banner{
+    width : 100%;
+    height : auto;
+}

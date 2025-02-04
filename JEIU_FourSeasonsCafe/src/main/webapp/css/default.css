@@ -1,0 +1,23 @@
+@charset "UTF-8";
+
+.nav-link{
+    color : white;
+}
+
+#main-logo{
+    width : 30%;
+    height : 15%;
+}
+
+.main-nav-unit{
+    width : 15%;
+}
+
+
+#main-navbar{
+    background-color: #5DC9A7;
+}
+
+footer{
+    width : 100%;
+}
