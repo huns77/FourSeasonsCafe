@@ -1,6 +1,8 @@
 package com.cafe.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -40,22 +42,29 @@ public class Logins extends HttpServlet {
             // 로그인 성공 시 세션에 사용자 정보 저장
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
-//            session.setAttribute("loginCheck", userID);
-//            session.setAttribute("userName", user.getUserName());
-            
+
             // 로그 확인
             System.out.println("로그인 성공: " + user.getUserID() + ", " + user.getUserName() + ", " + user.getAccount_check());
 
-            // 로그인 성공 메시지를 alert로 표시하고 메인 페이지로 이동
-            response.setContentType("text/html; charset=UTF-8");
-            response.getWriter().println("<script>alert('로그인 성공'); location.href='../JEIU_FourSeasonsCafe/index.jsp';</script>");
+            // 서버 측에서 리다이렉트 처리 (location.href 대신 사용)
+            PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('로그인 성공');");
+            out.println("/<script>");
+            response.sendRedirect("../JEIU_FourSeasonsCafe/index.jsp");
         } else {
             // 로그인 실패 메시지를 alert로 표시하고 로그인 페이지로 이동
             response.setContentType("text/html; charset=UTF-8");
-            response.getWriter().println("<script>alert('로그인에 실패했습니다. 아이디 또는 비밀번호를 확인 해주세요.'); location.href='../JEIU_FourSeasonsCafe/Login.jsp';</script>");
-            
+            PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('로그인에 실패했습니다. 아이디 또는 비밀번호를 확인 해주세요.');");
+            out.println("window.location.replace('../JEIU_FourSeasonsCafe/Login.jsp');"); // replace()는 브라우저 히스토리를 남기지 않음
+            out.println("</script>");
+            out.flush();
+
             // 로그 확인
             System.out.println("로그인 실패: " + userID);
         }
+
     }
 }

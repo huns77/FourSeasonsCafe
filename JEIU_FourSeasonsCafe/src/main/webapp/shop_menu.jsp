@@ -61,8 +61,16 @@
 	                            <td><%= product.getDescription() %></td>
 	                            <td><%= product.getStock() %></td>
 	                            <td colspan="2">
-	                                <input type="button" class="btn btn-outline-success" onclick="location.href='./productManage/Product_description.jsp?products_id=<%= product.getProducts_id()%>'" value="상세보기">
-	                                <input type="button" class="btn btn-outline-success" onclick="location.href='./productManage/Product_del.jsp?products_id=<%= product.getProducts_id() %>'" value="삭제하기">
+	                                <form action="./productManage/Product_description.jsp" method="get" style="display:inline;">
+									    <input type="hidden" name="products_id" value="<%= product.getProducts_id() %>">
+									    <input type="submit" class="btn btn-outline-success" value="상세보기">
+									</form>
+									
+									<form action="./productManage/Product_del.jsp" method="get" style="display:inline;">
+									    <input type="hidden" name="products_id" value="<%= product.getProducts_id() %>">
+									    <input type="submit" class="btn btn-outline-success" value="삭제하기">
+									</form>
+
 	                            </td>
 	                        </tr>
                   <%

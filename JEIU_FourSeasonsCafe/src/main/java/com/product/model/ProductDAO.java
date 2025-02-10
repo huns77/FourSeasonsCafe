@@ -56,6 +56,39 @@ public class ProductDAO {
         
         return pd;
     }
+    public boolean reduceStock(int productID, int quantity) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        boolean result = false;
+
+        try {
+            con = DBService.getInstance().getConnection();
+
+            // 현재 재고 확인
+            String checkStockQuery = "SELECT stock FROM products WHERE products_id = ?";
+            pstmt = con.prepareStatement(checkStockQuery);
+            pstmt.setInt(1, productID);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                int currentStock = rs.getInt("stock");
+
+                if (currentStock >= quantity) {
+                    // 재고가 충분하면 감소
+                    String updateStockQuery = "UPDATE products SET stock = stock - ? WHERE products_id = ?";
+                    pstmt = con.prepareStatement(updateStockQuery);
+                    pstmt.setInt(1, quantity);
+                    pstmt.setInt(2, productID);
+                    
+                    int updatedRows = pstmt.executeUpdate();
+                    result = (updatedRows > 0);
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex);
+        }
+        return result;
+    }
 
     public boolean insertProduct(HttpServletRequest req) {
         Connection con = null;

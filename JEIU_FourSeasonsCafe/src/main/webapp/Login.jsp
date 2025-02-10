@@ -8,7 +8,7 @@
 <%
     // 네이버 로그인 API 설정
     String clientId = "2mf3OCn4Fci2L2sZqAE_"; // 애플리케이션 클라이언트 아이디값
-    String redirectURI = URLEncoder.encode("http://localhost:8086/JEIU_FourSeasonsCafe/NaverCallback.jsp", "UTF-8");
+    String redirectURI = URLEncoder.encode("http://localhost:8080/JEIU_FourSeasonsCafe/NaverCallback.jsp", "UTF-8");
     SecureRandom random = new SecureRandom();
     String state = new BigInteger(130, random).toString();
     String apiURL = "https://nid.naver.com/oauth2.0/authorize?response_type=code"
@@ -52,7 +52,7 @@
         
         <div class="login_box">
 	        <div class="login_bar">
-		          <form action="../JEIU_FourSeasonsCafe/login.do" method="post">
+		          <form action="../JEIU_FourSeasonsCafe/login.do" method="post" autocomplete="off">
 		            <div class="w-100">
 		                <div class="ID_class">아이디 <input type="text" id="id" name="userID"></div>
 		                <div class="PW_class">비밀번호 <input type="password" id="pw" name="userPW"></div>
