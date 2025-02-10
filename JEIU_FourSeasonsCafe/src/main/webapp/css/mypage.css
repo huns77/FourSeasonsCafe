@@ -3,7 +3,7 @@
 .ul_bar {
    width: 300px;
    background-color: powderblue;
-   height: 800px;
+   height: auto;
 }
 ul {
    display: inline;

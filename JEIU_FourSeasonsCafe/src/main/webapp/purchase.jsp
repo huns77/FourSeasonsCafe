@@ -40,14 +40,15 @@
         IMP.init('imp00866258');  // 가맹점 코드 (IAMPORT의 발급된 코드)
 
         IMP.request_pay({
-            pg : 'kakaopay',  // PG사 선택 (카카오페이)
-            pay_method : 'card',  // 결제 방법
-            merchant_uid : 'merchant_' + new Date().getTime(),  // 고유 결제 ID
-            name : '<%= request.getParameter("order_count") %> 개 상품',
-            amount : <%= total_amount %>,  // 숫자로 전달
-            buyer_email : 'user@example.com',
-            buyer_name : '<%= user.getUserName() != null ? user.getUserName() : "이름 미제공" %>',  // null 체크
-            buyer_tel : '010-1234-5678'
+            pg: 'kakaopay',
+            pay_method: 'card',
+            merchant_uid: 'merchant_' + new Date().getTime(),
+            name: '<%= request.getParameter("order_count") %> 개 상품',
+            amount: <%= total_amount %>,
+            buyer_email: 'user@example.com',
+            buyer_name: '<%= user.getUserName() != null ? user.getUserName() : "이름 미제공" %>',
+            buyer_tel: '010-1234-5678',
+            popup: true  // 👉 새 창에서 결제 진행
         }, function(rsp) {
             if (rsp.success) {
                 $.ajax({
@@ -69,6 +70,7 @@
                 alert('결제에 실패하였습니다: ' + rsp.error_msg);
             }
         });
+
     });
     </script> 
 
