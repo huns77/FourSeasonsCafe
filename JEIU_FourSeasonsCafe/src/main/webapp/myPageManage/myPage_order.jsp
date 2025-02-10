@@ -10,7 +10,7 @@
 <%
     UserDTO user_id = (UserDTO) session.getAttribute("user");
     if (user_id == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect(request.getContextPath() + "/Login.jsp");
         return;
     }
     
@@ -33,6 +33,7 @@
 <table class="table table-bordered">
     <thead>
     <tr>
+    	<th>주문날짜</th>
         <th>상품이미지</th>
         <th>상품명</th>
         <th>수량</th>
@@ -59,6 +60,7 @@
             }
     %>
     <tr>
+    	<td><%= order.getOrder_date() %>
         <td><img src="../data/<%= product.getImage() %>" style="width: 100px"></td>
         <td><%= product.getName() %></td>
         <td><%= order.getOrder_count() %></td>

@@ -3,6 +3,7 @@ package com.order.model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,31 +93,35 @@ public class OrderDAO {
 		return list;
 	}
 	
-	public int insert(int order_count, int total_amount, int user_id, int product_id) {
-		int result = 0;
-		
-		Connection connection = null;
-		PreparedStatement pstmt = null;
-		
-		String sql = "INSERT INTO orders VALUES (null, now(), '0', ?, ?, ?, ?)";
-		
-		try {
-			connection = DBService.getInstance().getConnection();
-			pstmt = connection.prepareStatement(sql);
-			pstmt.setInt(1, order_count);
-			pstmt.setInt(2, total_amount);
-			pstmt.setInt(3, user_id);
-			pstmt.setInt(4, product_id);
-			
-			result = pstmt.executeUpdate();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}finally {
-			DBService.getInstance().closeAll(connection, pstmt);
-		}
-		
-		return result;
+	public int insert(OrderDTO order) {
+	    int result = 0;
+	    Connection connection = null;
+	    PreparedStatement pstmt = null;
+	    
+	    // SQL 쿼리문
+	    String sql = "INSERT INTO orders (order_date, order_checked, order_count, total_amount, user_id, product_id) VALUES (now(), '0', ?, ?, ?, ?)";
+	    
+	    try {
+	        connection = DBService.getInstance().getConnection();
+	        pstmt = connection.prepareStatement(sql);
+	        
+	        // OrderDTO 객체에서 값을 가져와서 설정
+	        pstmt.setInt(1, order.getOrder_count());
+	        pstmt.setInt(2, order.getTotal_amount());
+	        pstmt.setInt(3, order.getUser_id());  // user_id는 String 타입
+	        pstmt.setInt(4, order.getProduct_id());
+	        
+	        // 실행
+	        result = pstmt.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        DBService.getInstance().closeAll(connection, pstmt);
+	    }
+	    
+	    return result;
 	}
+
 	
 	
 	public List<OrderDTO> getUserOrderList(int user_id) {
@@ -152,7 +157,25 @@ public class OrderDAO {
 
         return orderList;
     }
-	
+	public boolean createOrder(int userId, int productId, int orderCount, int totalAmount) {
+        String sql = "INSERT INTO orders (order_date, order_checked, order_count, total_amount, user_id, product_id) VALUES (NOW(), 'N', ?, ?, ?, ?)";
+
+        try (Connection conn = DBService.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, orderCount);
+            pstmt.setInt(2, totalAmount);
+            pstmt.setInt(3, userId);
+            pstmt.setInt(4, productId);
+
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 	
 	public int delete(int order_id) {
 		int result = 0;

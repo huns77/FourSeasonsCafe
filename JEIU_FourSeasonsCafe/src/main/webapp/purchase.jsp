@@ -10,7 +10,7 @@
     String total_amount = request.getParameter("total_amount");
     String user_id = request.getParameter("user_id");
     String products_id = request.getParameter("products_id");
-
+    response.setHeader("Access-Control-Allow-Origin", "https://online-payment.kakaopay.com");
     UserDTO user = (UserDTO) session.getAttribute("user");
 
     if (user == null) {
