@@ -39,8 +39,17 @@
 			
 		})
 	});
-	
-
+	function del(order_id){
+		// 삭제 확인을 위한 confirm 창 띄우기
+		if (confirm("정말로 삭제하시겠습니까?")) {
+			// 사용자가 "확인"을 클릭한 경우 삭제 처리
+			let id = parseInt(order_id);
+			location.href = "./orderManage/order_delete.jsp?order_id=" + id;
+		} else {
+			// 사용자가 "취소"를 클릭한 경우 아무 동작도 하지 않음
+			return false;
+		}
+	}
 
 	function change_selected(order_id, order_checked){
 		let orderId = parseInt(order_id);
@@ -49,13 +58,6 @@
 		location.href="./orderManage/order_status_Process.jsp?order_id="+order_id + "&orderChecked="+orderChecked;
 	}
 	
-	
-	function del(order_id){
-	
-		let id = parseInt(order_id);
-		
-		location.href="./orderManage/order_delete.jsp?order_id="+id;
-	}
 	
 </script>
 </head>

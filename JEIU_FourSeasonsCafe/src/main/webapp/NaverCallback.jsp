@@ -21,7 +21,6 @@
     apiURL += "&state=" + state;
 
     String accessToken = "";
-    String refreshToken = "";
     StringBuffer responseBuffer = new StringBuffer();
 
     try {
@@ -44,7 +43,6 @@
         if (responseCode == 200) {
             JSONObject jsonObj = new JSONObject(responseBuffer.toString());
             accessToken = jsonObj.getString("access_token");
-            refreshToken = jsonObj.getString("refresh_token");
         } else {
             out.println("에러: " + responseBuffer.toString());
         }
@@ -87,33 +85,33 @@
                 String birthyear = responseObj.getString("birthyear");
                 String mobile = responseObj.getString("mobile");
 
+                // 이미 해당 이메일로 사용자가 존재하는지 확인
+                UserDAO userDAO = UserDAO.getInstance();
+                boolean userExists = userDAO.checkUserExistsByEmail(email);
 
-                System.out.println("ID: " + naverCode);
-                System.out.println("Name: " + namez);
-                System.out.println("Email: " + email);
-                System.out.println("Birthyear: " + birthyear);
-                System.out.println("Mobile: " + mobile);
-
-			
-				UserDTO ud = new UserDTO();
-				
-				ud.setId(100);
-				ud.setUserID(email);
-				ud.setUserPW(naverCode.substring(0, 16));
-				ud.setUserName(namez);
-				ud.setUserBirth(birthyear);
-				ud.setUserTel(mobile);
-				ud.setEmail(email);
-
-				int result = UserDAO.getInstance().naver_join(ud);
-				
-                if (result >= 1) {
-                	UserDTO naver_ud = UserDAO.getInstance().getUserId(100);
-                    session.setAttribute("user", naver_ud);
-                    response.sendRedirect("index.jsp");
+                UserDTO user = new UserDTO();
+                if (userExists) {
+                    // 이미 존재하면 로그인 처리
+                    user = userDAO.getUserByEmail(email);
                 } else {
-                    out.println("사용자 정보 저장에 실패했습니다.");
+                    // 존재하지 않으면 새로운 사용자 생성
+                    int nextId = userDAO.getNextUserId();
+                    user.setId(nextId);
+                    user.setUserID(email);
+                    user.setUserPW(naverCode.substring(0, 16));
+                    user.setUserName(namez);
+                    user.setUserBirth(birthyear);
+                    user.setUserTel(mobile);
+                    user.setEmail(email);
+                    int result = userDAO.naver_join(user);
+                    if (result >= 1) {
+                        user = userDAO.getUserByEmail(email); // 새로 가입한 사용자 정보 조회
+                    }
                 }
+
+                // 로그인 후 세션에 사용자 정보 설정
+                session.setAttribute("user", user);
+                response.sendRedirect("index.jsp");
             } else {
                 out.println("네이버 API 호출에 실패했습니다.");
             }

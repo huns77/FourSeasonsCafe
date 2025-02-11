@@ -9,6 +9,7 @@ public class UserDTO {
 	private String userBirth;
 	private String email;
 	private String account_check;
+
 	private int point;
 	
 	public String getUserID() {
@@ -66,4 +67,5 @@ public class UserDTO {
 	public void setUserTel(String userTel) {
 		this.userTel = userTel;
 	}
+
 }

@@ -3,6 +3,7 @@ package com.user.model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,31 +51,109 @@ public class UserDAO {
     
     
     public int naver_join(UserDTO ud) {
-    	int result = 0;
-    	
-    	Connection connection = null;
-    	PreparedStatement pstmt = null;
-    	
-    	String sql = "INSERT INTO user VALUES(?, ?, ?, ?, ?, ?, ?, '0', null)";
-    	try {
-    		connection = DBService.getInstance().getConnection();
-    		pstmt = connection.prepareStatement(sql);
-    		pstmt.setInt(1, ud.getId());
-    		pstmt.setString(2, ud.getUserID());
-    		pstmt.setString(3, ud.getUserPW());
-    		pstmt.setString(4, ud.getUserName());
-    		pstmt.setString(5, ud.getUserBirth());
-    		pstmt.setString(6, ud.getUserTel());
-    		pstmt.setString(7, ud.getEmail());
-    		
-    		result = pstmt.executeUpdate();
-    	}catch (Exception e) {
-			e.printStackTrace();
-		}finally {
-			DBService.getInstance().closeAll(connection, pstmt);
-		}
-    	
-    	return result;
+        int result = 0;
+        
+        // 1. 이메일로 사용자 존재 여부 확인
+        UserDTO existingUser = getUserByEmail(ud.getEmail());
+        
+        if (existingUser != null) {
+            // 2. 사용자가 이미 존재하면 해당 사용자 정보를 반환
+            result = 1;  // 로그인 처리로 넘어가게 하기 위해
+        } else {
+            // 3. 사용자가 존재하지 않으면 새로운 사용자로 회원가입 처리
+            Connection connection = null;
+            PreparedStatement pstmt = null;
+
+            // 사용자 정보 추가
+            String sql = "INSERT INTO user (userID, userPW, userName, userBirth, userTel, email, account_check) VALUES (?, ?, ?, ?, ?, ?, '0')";
+            
+            try {
+                connection = DBService.getInstance().getConnection();
+                pstmt = connection.prepareStatement(sql);
+                pstmt.setString(1, ud.getUserID());
+                pstmt.setString(2, ud.getUserPW());
+                pstmt.setString(3, ud.getUserName());
+                pstmt.setString(4, ud.getUserBirth());
+                pstmt.setString(5, ud.getUserTel());
+                pstmt.setString(6, ud.getEmail());
+
+                result = pstmt.executeUpdate();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                DBService.getInstance().closeAll(connection, pstmt);
+            }
+        }
+
+        return result;
+    }
+    public int getNextUserId() {
+        int nextId = 0;
+        String sql = "SELECT MAX(id) FROM user";
+        
+        try (Connection conn = DBService.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                nextId = rs.getInt(1) + 1; // 최대 id 값을 구한 후 1을 더해 새로운 ID 생성
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return nextId;
+    }
+    public boolean checkUserExistsByEmail(String email) {
+        boolean exists = false;
+        String sql = "SELECT COUNT(*) FROM user WHERE email = ?";
+        
+        try (Connection conn = DBService.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0; // 이메일이 존재하면 true
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exists;
+    }
+    public UserDTO getUserByEmail(String email) {
+        UserDTO user = null;
+
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
+        try {
+            String sql = "SELECT * FROM user WHERE email = ?";
+            connection = DBService.getInstance().getConnection();
+            pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, email);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                user = new UserDTO();
+                user.setId(rs.getInt("id"));
+                user.setUserID(rs.getString("userID"));
+                user.setUserPW(rs.getString("userPW"));
+                user.setUserName(rs.getString("userName"));
+                user.setUserBirth(rs.getString("userBirth"));
+                user.setUserTel(rs.getString("userTel"));
+                user.setEmail(rs.getString("email"));
+                user.setAccount_check(rs.getString("account_check"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DBService.getInstance().closeAll(connection, pstmt, rs);
+        }
+
+        return user;
     }
     
     
