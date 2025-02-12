@@ -15,6 +15,7 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import com.service.DBService;
 
 
+
 public class ProductDAO {
     public static ProductDAO single = null;
     
@@ -130,6 +131,29 @@ public class ProductDAO {
         return result;
     }
 
+        public int updateProduct(ProductDTO product) {
+            int result = 0;
+            String sql = "UPDATE products SET name = ?, price = ?, description = ?, stock = ?, image = ? WHERE products_id = ?";
+
+            try (Connection conn = DBService.getInstance().getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                // 값 세팅
+                pstmt.setString(1, product.getName());
+                pstmt.setInt(2, product.getPrice());
+                pstmt.setString(3, product.getDescription());
+                pstmt.setInt(4, product.getStock());
+                pstmt.setString(5, product.getImage());
+                pstmt.setInt(6, product.getProducts_id());  // 상품 ID
+
+                result = pstmt.executeUpdate();  // 업데이트 실행
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return result;  // 성공하면 1 이상, 실패하면 0 반환
+        }
     public List<ProductDTO> getProductList() throws SQLException {
     	List<ProductDTO> productList = new ArrayList<>();
 

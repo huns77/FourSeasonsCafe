@@ -270,33 +270,47 @@ public class UserDAO {
     }
 
     public int modify(UserDTO ud) {
-    	int result = 0;
-
-    	Connection connection = null;
-    	PreparedStatement pstmt = null;
+        int result = 0;
+        Connection connection = null;
+        PreparedStatement pstmt = null;
         
         try {
-            String sql = "UPDATE user SET userID = ?, userPW = ?, userName = ?, userBirth = ?,userTel = ?, email = ? WHERE id=?";
+            // UserDTO 객체가 null이면 예외 발생 방지
+            if (ud == null) {
+                throw new Exception("UserDTO 객체가 null입니다.");
+            }
+
+            // 기존 사용자 정보 가져오기 (비밀번호 유지 목적)
+            UserDAO userDAO = UserDAO.getInstance();
+            UserDTO existingUser = userDAO.getUserId(ud.getId());
+
+            if (existingUser == null) {
+                throw new Exception("사용자 정보를 찾을 수 없습니다.");
+            }
+
+            // 비밀번호가 입력되지 않은 경우 기존 비밀번호 유지
+            String userPW = (ud.getUserPW() == null || ud.getUserPW().isEmpty()) ? existingUser.getUserPW() : ud.getUserPW();
+
+            String sql = "UPDATE user SET userID = ?, userPW = ?, userName = ?, userBirth = ?, userTel = ?, email = ? WHERE id=?";
             connection = DBService.getInstance().getConnection();
             pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, ud.getUserID());
-            pstmt.setString(2, ud.getUserPW());
+            pstmt.setString(2, userPW);  // 유지된 비밀번호 적용
             pstmt.setString(3, ud.getUserName());
             pstmt.setString(4, ud.getUserBirth());
             pstmt.setString(5, ud.getUserTel());
             pstmt.setString(6, ud.getEmail());
             pstmt.setInt(7, ud.getId());
 
-
             result = pstmt.executeUpdate();
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         } finally {
-        	DBService.getInstance().closeAll(connection, pstmt);
+            DBService.getInstance().closeAll(connection, pstmt);
         }
         return result;
     }
-    
+
     public int delete(int id) {
     	int result = 0;
     	

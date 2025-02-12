@@ -7,9 +7,18 @@
     pageEncoding="UTF-8"%>
 
 <%
+
+
+
     UserDTO user = (UserDTO) session.getAttribute("user");
     String naver = (String) session.getAttribute("naver");
-    
+
+	if(user == null){
+		response.sendRedirect(request.getContextPath() + "/Login.jsp");
+	    out.println("<script>alert('로그인이 필요합니다.'); location.href='../Login.jsp';</script>");
+		return;
+	}
+	
     String userNames = "";
     int userPoint = 0;
     int coupons = 0;
@@ -39,6 +48,7 @@
             delivered++;
         }
     }
+
 %>
     
 <!DOCTYPE html>
